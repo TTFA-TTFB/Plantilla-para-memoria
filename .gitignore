@@ -1,0 +1,23 @@
+# LaTeX — artefactos de compilación
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.bbl
+*.blg
+*-blx.bib
+*.run.xml
+*.bcf
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*~
