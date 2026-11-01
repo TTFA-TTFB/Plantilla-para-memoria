@@ -27,9 +27,9 @@
 
 % Redefinición de caracteres problemáticos en marcadores
 \hypersetup{
-    pdftitle={Título del Documento},
-    pdfauthor={Autor del Documento},
-    pdfkeywords={Sistemas Embebidos, Internet de las Cosas, Inteligencia Artificial},
+    pdftitle={Sistema de telemetría y detección de eventos para motocicletas},
+    pdfauthor={Tomás Enrique Botalla},
+    pdfkeywords={Sistemas embebidos, telemetría, motocicletas, detección de eventos},
     pdfstartview={FitH},
     unicode=true,
     colorlinks=true,
@@ -51,8 +51,8 @@
 
 
 % Definir comandos requeridos por la clase
-\newcommand{\degreename}{Maestría en Ciencias} % Cambia según tu título
-\newcommand{\univname}{Universidad Nacional de Ejemplo} % Cambia según tu universidad
+\newcommand{\degreename}{Carrera de Especialización en Sistemas Embebidos}
+\newcommand{\univname}{Universidad de Buenos Aires}
 \newcommand{\keywordnames}{Palabras clave:}
 %----------------------------------------------------------------------------------------
 % Documento Principal
@@ -61,8 +61,8 @@
 \begin{document}
 
 % Configuración de la portada
-\posgrado{Carrera / Maestría}
-\keywords{Sistemas Embebidos, Internet de las Cosas, Inteligencia Artificial}
+\posgrado{Carrera de Especialización en Sistemas Embebidos}
+\keywords{Sistemas embebidos, telemetría, motocicletas, detección de eventos}
 
 % Incluir la portada desde un archivo separado
 \include{portada}
@@ -76,18 +76,20 @@
 %----------------------------------------------------------------------------------------
 
 \begin{abstract}
-\addchaptertocentry{\abstractname} % Agregar resumen al índice
-El resumen debe escribirse en uno o dos párrafos. Debe ser breve y conciso, sin ningún elemento de formato en el texto como itálicas o negritas. Tampoco se deben usar siglas ni acrónimos que no resulten obvios para un lector promedio de la memoria, ni referencias bibliográficas o notas al pie de página. No debe faltar qué es lo que se hizo/logró, qué importancia/valor tiene el proyecto/resultado, qué va a encontrar el lector en la memoria y qué contenidos de la especialización/maestría se aplicaron en el proyecto.
+\addchaptertocentry{\abstractname}
+En la presente memoria se describe el diseño e implementación de un sistema embebido de telemetría y detección de eventos para motocicletas. Este trabajo brinda un dispositivo embebido con adquisición de variables cinemáticas, y geográficas, almacenamiento en tarjeta de memoria removible, detección de eventos críticos con respaldo previo a un impacto y comunicación con una aplicación móvil.
+
+Para su implementación fueron clave los conocimientos relacionados a: programación de microcontroladores, protocolos de comunicación, pruebas de software, sistemas operativos de tiempo real y gestión de proyectos.
 \end{abstract}
 
 %----------------------------------------------------------------------------------------
 % Agradecimientos
 %----------------------------------------------------------------------------------------
 
-\begin{acknowledgements}
-\vspace{1.5cm}
-Esta sección es para agradecimientos personales y es totalmente \textbf{OPCIONAL}.
-\end{acknowledgements}
+% \begin{acknowledgements}
+% \vspace{1.5cm}
+% Esta sección es para agradecimientos personales y es totalmente \textbf{OPCIONAL}.
+% \end{acknowledgements}
 
 %----------------------------------------------------------------------------------------
 % Índice
@@ -101,7 +103,7 @@ Esta sección es para agradecimientos personales y es totalmente \textbf{OPCIONA
 % Dedicatoria
 %----------------------------------------------------------------------------------------
 
-\dedicatory{\textbf{Dedicado a... [OPCIONAL]}}
+% \dedicatory{\textbf{Dedicado a... [OPCIONAL]}}
 
 %----------------------------------------------------------------------------------------
 % Capítulos
