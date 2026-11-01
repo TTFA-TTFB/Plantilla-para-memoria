@@ -19,5 +19,6 @@
 Thumbs.db
 
 # Editor
+.idea/
 *.swp
 *~
