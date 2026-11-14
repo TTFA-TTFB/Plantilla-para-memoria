@@ -26,6 +26,8 @@ Evitá:
 - mezcla de estilos entre escritura propia y IA
 - expresiones informales, vagas o marcas personales (redacción impersonal)
 
+**Unidades de medida (español):** escribir la unidad pegada al número (p. ej. `180MHz`, `3.3V`, `100kHz`, `512KiB`). No usar espacio irrompible de LaTeX (`~`) entre cifra y unidad.
+
 Si el usuario aporta texto de referencia, usarlo solo como guía de estilo, sin copiar frases ni contenido.
 
 Al entregar cambios sustanciales de redacción, **señalar advertencias** si detectás datos técnicos, citas, fechas o cifras que deberían verificarse contra el proyecto o la bibliografía.
