@@ -10,7 +10,7 @@ Este capítulo presenta las tecnologías de hardware y de software de terceros q
 
 La plataforma de desarrollo seleccionada fue la placa NUCLEO-F446RE \citep{st_nucleo_f446re}, que integra el microcontrolador STM32F446RET6 en encapsulado LQFP64 \citep{st_stm32f446re}. El núcleo es un procesador ARM Cortex-M4 con unidad de punto flotante y periféricos orientados a adquisición de datos, temporización y comunicación serie.
 
-Según la documentación del fabricante, el STM32F446RET6 admite frecuencias de reloj de hasta 180~MHz y dispone de controladores USART, I2C (\textit{Inter-Integrated Circuit}), SPI (\textit{Serial Peripheral Interface}), acceso directo a memoria (DMA, del inglés \textit{Direct Memory Access}), temporizadores de propósito general y un IWDG (del inglés \textit{Independent Watchdog}). En la placa NUCLEO-F446RE se integra un depurador ST-LINK con puerto serie virtual, habitual en etapas de depuración. En la figura~\ref{fig:nucleo-f446re} se muestra la placa de desarrollo empleada.
+Según la documentación del fabricante, el STM32F446RET6 admite frecuencias de reloj de hasta 180MHz y dispone de controladores USART (del inglés \textit{Universal Synchronous/Asynchronous Receiver Transmitter}), I2C (del inglés \textit{Inter-Integrated Circuit}), SPI (del inglés \textit{Serial Peripheral Interface}), acceso directo a memoria (DMA, del inglés \textit{Direct Memory Access}), temporizadores de propósito general y un IWDG (del inglés \textit{Independent Watchdog}). En la placa NUCLEO-F446RE se integra un depurador ST-LINK con puerto serie virtual, habitual en etapas de depuración. En la figura~\ref{fig:nucleo-f446re} se muestra la placa de desarrollo empleada.
 
 \begin{figure}[H]
 	\centering
@@ -23,13 +23,13 @@ La elección de esta familia se fundamentó en la disponibilidad de varios buses
 
 \subsection{Herramientas de desarrollo y depuración}
 
-Por último, la plataforma se complementa con el ecosistema STM32Cube de STMicroelectronics. STM32CubeMX es la utilidad gráfica para definir pines, relojes e instancias de periféricos en el microcontrolador. STM32CubeIDE \citep{st_stm32cubeide} agrupa el editor de código, el depurador y el compilador cruzado GNU para ARM (\texttt{arm-none-eabi-gcc}). Ambas herramientas permiten generar y mantener proyectos basados en la capa HAL.
+Además, la plataforma se complementa con el ecosistema STM32Cube de STMicroelectronics. STM32CubeMX es la utilidad gráfica para definir pines, relojes e instancias de periféricos en el microcontrolador. STM32CubeIDE \citep{st_stm32cubeide} agrupa el editor de código, el depurador y el compilador cruzado GNU para ARM (\texttt{arm-none-eabi-gcc}). Ambas herramientas permiten generar y mantener proyectos basados en la capa HAL.
 
 %----------------------------------------------------------------------------------------
 \section{Componentes y módulos externos}
 \label{sec:componentes-externos}
 
-El prototipo incorpora módulos de adquisición, comunicación y almacenamiento cableados al microcontrolador: receptor GNSS \citep{gnss_overview}, unidad inercial de seis ejes, transceptor Bluetooth de baja energía y tarjeta microSD. En la tabla~\ref{tab:componentes-externos} se resume la función de cada elemento y el tipo de interfaz física que expone.
+El prototipo incorpora módulos de adquisición, comunicación y almacenamiento cableados al microcontrolador: receptor GNSS \citep{gnss_overview}, unidad inercial de seis ejes, transceptor Bluetooth de baja energía y tarjeta microSD. Esos periféricos usan buses serie del tipo UART (del inglés \textit{Universal Asynchronous Receiver Transmitter}), I2C y SPI. En la tabla~\ref{tab:componentes-externos} se resume la función de cada elemento y el tipo de interfaz física que expone.
 
 \begin{table}[H]
 	\centering
@@ -39,7 +39,7 @@ El prototipo incorpora módulos de adquisición, comunicación y almacenamiento 
 		\toprule
 		\textbf{Módulo} & \textbf{Función} & \textbf{Interfaz física} & \textbf{Características relevantes} \\
 		\midrule
-		NEO-M8N & Posicionamiento GNSS & UART & Salida de tramas en formato NMEA. Alimentación 3.3~V típica \citep{ublox_neo_m8n} \\
+		NEO-M8N & Posicionamiento GNSS & UART & Salida de tramas en formato NMEA. Alimentación 3.3V típica \citep{ublox_neo_m8n} \\
 		LSM6DSO & Medición inercial (6 ejes) & I2C & Acelerómetro y giroscopio integrados. Dirección I2C configurable \citep{st_lsm6dso} \\
 		HC-10 (BT05) & Enlace Bluetooth & UART & Módulo transparente hacia un controlador BLE en el extremo móvil \citep{hc10_bt05} \\
 		Tarjeta microSD & Memoria removible & SPI & Soporta sistemas de archivos FAT en aplicaciones embebidas \\
@@ -66,7 +66,7 @@ La unidad LSM6DSO \citep{st_lsm6dso} integra acelerómetro y giroscopio triaxial
 	\label{fig:lsm6dso-modulo}
 \end{figure}
 
-El módulo HC-10 (variante BT05 sobre CC2541) \citep{hc10_bt05} se enlaza al microcontrolador por UART (\textit{Universal Asynchronous Receiver Transmitter}). El enlace Bluetooth de baja energía con el teléfono lo gestiona el propio módulo, de modo que el firmware solo envía y recibe octetos por ese puerto, sin implementar protocolos BLE. En la figura~\ref{fig:hc10-modulo} se ilustra el módulo empleado.
+El módulo HC-10 (variante BT05 sobre CC2541) \citep{hc10_bt05} se enlaza al microcontrolador por UART. El enlace Bluetooth de baja energía con el teléfono lo gestiona el propio módulo, de modo que el host embebido puede limitarse a enviar y recibir octetos por ese puerto sin implementar el protocolo BLE en software. En la figura~\ref{fig:hc10-modulo} se ilustra el módulo empleado.
 
 \begin{figure}[H]
 	\centering
@@ -100,7 +100,7 @@ La capa HAL expone rutinas de configuración y tipos comunes para UART, I2C y SP
 
 En el extremo móvil intervienen tecnologías web estándar. Una aplicación web progresiva (PWA, del inglés \textit{Progressive Web App}) \citep{mdn_pwa} permite desplegar una interfaz en el navegador con comportamiento cercano al de una aplicación nativa. React \citep{react} es una biblioteca para construir interfaces por componentes, y Vite \citep{vite} una herramienta de empaquetado y servidor de desarrollo para el ecosistema JavaScript.
 
-La API Web Bluetooth \citep{w3c_web_bluetooth} del navegador habilita la comunicación con periféricos BLE desde una página web, sin publicar un binario en las tiendas. Para mapas interactivos se utilizó la biblioteca Leaflet \citep{leaflet}. El diseño concreto del cliente, el flujo de datos y la integración con el módulo HC-10 se describen en el capítulo~\ref{Chapter3}.
+La API Web Bluetooth \citep{w3c_web_bluetooth} del navegador habilita la comunicación con periféricos BLE desde una página web, sin publicar un binario en las tiendas. Para mapas interactivos se emplean bibliotecas como Leaflet \citep{leaflet}. El diseño concreto del cliente, el flujo de datos y la integración con el módulo HC-10 se describen en el capítulo~\ref{Chapter3}.
 
 %----------------------------------------------------------------------------------------
 \section{Protocolos y buses de comunicación}
