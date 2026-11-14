@@ -1,94 +1,177 @@
-\chapter{Diseño e implementación} % Main chapter title
+\chapter{Diseño e implementación}
 
-\label{Chapter3} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
+\label{Chapter3}
 
-Todos los capítulos deben comenzar con un breve párrafo introductorio que indique cuál es el contenido que se encontrará al leerlo.  La redacción sobre el contenido de la memoria debe hacerse en presente y todo lo referido al proyecto en pasado, siempre de modo impersonal.
+Este capítulo detalla la arquitectura del prototipo de telemetría, el diseño del hardware, la implementación de las comunicaciones con los periféricos y la integración con el dispositivo móvil.
 
-\definecolor{mygreen}{rgb}{0,0.6,0}
-\definecolor{mygray}{rgb}{0.5,0.5,0.5}
-\definecolor{mymauve}{rgb}{0.58,0,0.82}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% parámetros para configurar el formato del código en los entornos lstlisting
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\lstset{ %
-  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
-  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
-  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
-  breaklines=true,                 % sets automatic line breaking
-  captionpos=b,                    % sets the caption-position to bottom
-  commentstyle=\color{mygreen},    % comment style
-  deletekeywords={...},            % if you want to delete keywords from the given language
-  %escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
-  %extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
-  %frame=single,	                % adds a frame around the code
-  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
-  keywordstyle=\color{blue},       % keyword style
-  language=[ANSI]C,                % the language of the code
-  %otherkeywords={*,...},           % if you want to add more keywords to the set
-  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
-  numbersep=5pt,                   % how far the line-numbers are from the code
-  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
-  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
-  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
-  showstringspaces=false,          % underline spaces within strings only
-  showtabs=false,                  % show tabs within strings adding particular underscores
-  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
-  stringstyle=\color{mymauve},     % string literal style
-  tabsize=2,	                   % sets default tabsize to 2 spaces
-  title=\lstname,                  % show the filename of files included with \lstinputlisting; also try caption instead of title
-  morecomment=[s]{/*}{*/}
-}
-
+El capítulo se organiza en cinco ejes alineados con la estructura del proyecto. Primero se describe la arquitectura del sistema y el uso de la memoria del integrado. Segundo se presenta el diseño del hardware del prototipo. Tercero se documenta el diseño del firmware embebido y sus módulos principales. Cuarto se describen las interfaces de comunicación y el formato de los mensajes intercambiados. Quinto se explica la integración con la aplicación web en el teléfono.
 
 %----------------------------------------------------------------------------------------
-%	SECTION 1
+\section{Arquitectura del sistema}
+\label{sec:arquitectura-sistema}
+
+El sistema se dividió en dos partes con acoplamiento flexible. El dispositivo embebido en la motocicleta adquirió datos inerciales y de posicionamiento, registró series temporales en almacenamiento local y expuso un enlace serie hacia un módulo de Bluetooth de baja energía. El teléfono móvil concentró la interfaz de usuario, la visualización cartográfica y la recepción de telemetría cuando existió emparejamiento inalámbrico. Esa separación preservó el registro autónomo aun si el conductor no abrió la aplicación web.
+
+\subsection{Interconexión de módulos}
+
+En la placa NUCLEO-F446RE se centralizó la lectura de sensores, el acceso a la tarjeta microSD y el uso de tres instancias USART. El receptor NEO-M8N entregó tramas NMEA por USART1. La unidad inercial LSM6DSO respondió por I2C1. El módulo HC-10 reenvió octetos entre el integrado y el controlador Bluetooth del teléfono. En la figura~\ref{fig:interconexion-buses-cap3} se resume la asignación lógica entre los bloques de hardware.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.92\textwidth]{Figures/cap2-interconexion-buses.png}
+	\caption[Arquitectura en bloques]{Diagrama en bloques de la interconexión entre el microcontrolador y los periféricos del prototipo.}
+	\label{fig:interconexion-buses-cap3}
+\end{figure}
+
+\subsection{Arquitectura de software}
+
+En el microcontrolador intervinieron la capa HAL, el núcleo FreeRTOS \citep{freertos}, controladores para GNSS, unidad inercial, enlace Bluetooth y registro en tarjeta, además del middleware FatFs \citep{chan_fatfs}. La aplicación embebida se estructuró en tareas concurrentes. El acceso al hardware quedó mediado por drivers y por transferencias DMA en los enlaces de mayor caudal. En el teléfono, la PWA accedió al enlace Bluetooth del navegador \citep{mdn_pwa}\citep{w3c_web_bluetooth}. En la figura~\ref{fig:capas-software-cap3} se contrastan ambos lados del sistema.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\textwidth]{Figures/cap2-capas-software.png}
+	\caption[Capas de software]{Capas de software en el microcontrolador y en el teléfono móvil.}
+	\label{fig:capas-software-cap3}
+\end{figure}
+
+\subsection{Uso de la memoria del integrado}
+\label{sec:modelo-memoria-mcu}
+
+El código del firmware residió en memoria flash interna. En SRAM se ubicaron las pilas de las tareas del RTOS, los buffers de DMA, las colas de mensajes y las estructuras de telemetría. No se utilizó memoria de programa externa. La descripción de pines, relojes, instancias de DMA y periféricos se generó con STM32CubeMX y se integró al proyecto en STM32CubeIDE \citep{st_stm32cubeide}. El IWDG se habilitó como supervisión ante bloqueos del software y se alimentó de forma periódica desde una tarea dedicada del RTOS.
+
 %----------------------------------------------------------------------------------------
-\section{Análisis del software}
- 
-La idea de esta sección es resaltar los problemas encontrados, los criterios utilizados y la justificación de las decisiones que se hayan tomado.
+\section{Diseño del hardware}
+\label{sec:diseno-hardware}
 
-Se puede agregar código o pseudocódigo dentro de un entorno lstlisting con el siguiente código:
+En esta sección se describe el esquema eléctrico, el diseño del circuito impreso y la interconexión de los bloques de hardware del prototipo.
 
-\begin{verbatim}
-\begin{lstlisting}[caption= "un epígrafe descriptivo"]
-	las líneas de código irían aquí...
-\end{lstlisting}
-\end{verbatim}
+\subsection{Esquema eléctrico}
 
-A modo de ejemplo, se muestra el fragmento de código \ref{cod:vControl}:
+El esquema reunió el microcontrolador, la alimentación, los conectores hacia GNSS, unidad inercial, tarjeta microSD y el módulo de enlace Bluetooth, con la misma asignación lógica de buses que en la figura~\ref{fig:interconexion-buses-cap3}. En la figura~\ref{fig:cap3-esquema-electrico} se muestra el diagrama eléctrico del prototipo.
 
-\begin{lstlisting}[label=cod:vControl,caption=Pseudocódigo del lazo principal de control.]  % Start your code-block
+\begin{figure}[H]
+	\centering
+	\fbox{\begin{minipage}{0.9\textwidth}
+		\centering\vspace{0.28\textheight}
+		\textit{Espacio reservado para el esquema eléctrico.}\vspace{0.28\textheight}
+	\end{minipage}}
+	\caption[Esquema eléctrico]{Esquema eléctrico del prototipo de telemetría.}
+	\label{fig:cap3-esquema-electrico}
+\end{figure}
 
-#define MAX_SENSOR_NUMBER 3
-#define MAX_ALARM_NUMBER  6
-#define MAX_ACTUATOR_NUMBER 6
+\subsection{Circuito impreso}
 
-uint32_t sensorValue[MAX_SENSOR_NUMBER];		
-FunctionalState alarmControl[MAX_ALARM_NUMBER];	//ENABLE or DISABLE
-state_t alarmState[MAX_ALARM_NUMBER];						//ON or OFF
-state_t actuatorState[MAX_ACTUATOR_NUMBER];			//ON or OFF
+El circuito impreso integró los bloques del esquema en un único PCB orientado al montaje en el vehículo. En la figura~\ref{fig:cap3-pcb} se presenta el diseño de la placa (vista superior o de ensamblado).
 
-void vControl() {
+\begin{figure}[H]
+	\centering
+	\fbox{\begin{minipage}{0.9\textwidth}
+		\centering\vspace{0.28\textheight}
+		\textit{Espacio reservado para el diseño del circuito impreso.}\vspace{0.28\textheight}
+	\end{minipage}}
+	\caption[Circuito impreso]{Vista del circuito impreso del prototipo.}
+	\label{fig:cap3-pcb}
+\end{figure}
 
-	initGlobalVariables();
-	
-	period = 500 ms;
-		
-	while(1) {
+%----------------------------------------------------------------------------------------
+\section{Diseño del firmware}
+\label{sec:diseno-firmware}
 
-		ticks = xTaskGetTickCount();
-		
-		updateSensors();
-		
-		updateAlarms();
-		
-		controlActuators();
-		
-		vTaskDelayUntil(&ticks, period);
-	}
-}
-\end{lstlisting}
+\subsection{Organización en módulos}
 
+La lógica embebida se repartió en controladores que encapsulan cada periférico y en tareas de FreeRTOS que orquestan el muestreo y la publicación de datos. Los módulos \texttt{gps} y \texttt{lsm6dso} abstraen la lectura de GNSS y de la IMU. El módulo \texttt{bt\_module} concentra el envío por USART3. El módulo \texttt{sd\_logger}, junto con FatFs, administra el fichero CSV en la tarjeta.
 
+Tras la inicialización del hardware y el arranque del planificador coexistieron tareas de adquisición y análisis de NMEA, lectura periódica de la IMU, registro en microSD, enlace Bluetooth y supervisión con IWDG. Las tareas que acceden al bus SPI de la tarjeta serializaron el acceso al medio mediante un mutex (del inglés \textit{mutual exclusion}) del RTOS para evitar corrupción de ficheros. Los eventos entre módulos se canalizaron con colas y temporizadores de software del kernel. En la figura~\ref{fig:cap3-flujo-firmware} se resume el reparto entre tareas y el flujo de datos hasta la publicación por Bluetooth.
 
+\begin{figure}[H]
+	\centering
+	\fbox{\begin{minipage}{0.88\textwidth}
+		\centering\vspace{0.32\textheight}
+		\textit{Espacio reservado para diagrama de flujo del firmware.}\vspace{0.32\textheight}
+	\end{minipage}}
+	\caption[Flujo del firmware]{Diagrama de tareas del RTOS y flujo de telemetría.}
+	\label{fig:cap3-flujo-firmware}
+\end{figure}
+
+%----------------------------------------------------------------------------------------
+\section{Comunicaciones e interfaces}
+\label{sec:comunicaciones-implementacion}
+
+\subsection{Asignación de instancias en los buses}
+
+La tabla~\ref{tab:parametros-buses} reúne las instancias configuradas y el rol de cada una en el sistema.
+
+\begin{table}[H]
+	\centering
+	\caption[Parámetros de buses]{Parámetros de los buses configurados en el prototipo.}
+	\setlength{\tabcolsep}{4pt}
+	\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{1.45cm}>{\raggedright\arraybackslash}p{1.95cm}>{\raggedright\arraybackslash}p{2.35cm}>{\raggedright\arraybackslash}X@{}}
+		\toprule
+		\textbf{Bus} & \textbf{Periférico} & \textbf{Tasa / modo} & \textbf{Rol en el sistema} \\
+		\midrule
+		USART1 & NEO-M8N & 9600 baudios & Recepción NMEA por DMA hacia buffer circular \\
+		USART2 & ST-LINK VCP & 115200 baudios & Consola de depuración hacia el host \\
+		USART3 & HC-10 (BLE) & 9600 baudios & Enlace serie transparente con el teléfono \\
+		I2C1 & LSM6DSO & 100kHz, maestro & Lectura periódica de registros de la IMU \\
+		SPI2 & microSD & Maestro, DMA & Almacenamiento de ficheros CSV mediante FatFs \\
+		\bottomrule
+	\end{tabularx}
+	\label{tab:parametros-buses}
+\end{table}
+
+\subsection{Protocolo de telemetría sobre el enlace serie}
+\label{sec:protocolo-telemetria-serie}
+
+En USART1 el canal DMA trasladó los octetos entrantes a un buffer circular. Una tarea de mayor prioridad delimitó sentencias NMEA \citep{nmea_0183} y actualizó la estructura de fijación cuando la trama fue válida. Las líneas incompletas se descartaron antes del análisis. En I2C1 la unidad inercial se consultó en modo maestro a 100kHz con dirección de 7 bits 0x6A desde la tarea de adquisición.
+
+En USART3 el módulo HC-10 funcionó como túnel serie hacia el BLE (del inglés \textit{Bluetooth Low Energy}) del teléfono. Una tarea de enlace publicó la telemetría en formato JSON. Los mensajes inerciales aportaron aceleraciones y velocidades angulares en los tres ejes, junto con la temperatura de la unidad, con magnitudes representadas como enteros escalados. Los mensajes de posicionamiento entregaron el tipo de fijación, coordenadas geográficas, altitud, velocidad sobre el suelo, cantidad de satélites en uso y rumbo. No se definió un protocolo binario propietario sobre el UART.
+
+En SPI2 las transferencias en bloque hacia la tarjeta se realizaron con DMA bajo FatFs para reducir la carga del núcleo durante la escritura del fichero CSV. Cada registro incluyó una marca temporal en milisegundos, la hora UTC cuando el receptor GNSS dispuso de fecha y hora válidas, las tres componentes de aceleración y de velocidad angular, y la temperatura de la IMU. La primera fila del archivo declaró las columnas correspondientes y las sucesivas se alinearon al período de muestreo configurado en el firmware.
+
+En la figura~\ref{fig:cap3-formato-mensaje} se representa la organización de los mensajes JSON. En la figura~\ref{fig:cap3-secuencia-comunicacion} se ilustra la secuencia entre el ciclo de telemetría, el módulo HC-10 y el dispositivo móvil.
+
+\begin{figure}[H]
+	\centering
+	\fbox{\begin{minipage}{0.88\textwidth}
+		\centering\vspace{0.22\textheight}
+		\textit{Espacio reservado para organización de la trama o del mensaje JSON.}\vspace{0.22\textheight}
+	\end{minipage}}
+	\caption[Organización del mensaje]{Organización de los campos en los mensajes JSON de telemetría.}
+	\label{fig:cap3-formato-mensaje}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\fbox{\begin{minipage}{0.88\textwidth}
+		\centering\vspace{0.30\textheight}
+		\textit{Espacio reservado para diagrama de secuencia de comunicación.}\vspace{0.30\textheight}
+	\end{minipage}}
+	\caption[Secuencia de comunicación]{Diagrama de secuencia del intercambio entre firmware, HC-10 y dispositivo móvil.}
+	\label{fig:cap3-secuencia-comunicacion}
+\end{figure}
+
+\subsection{Canal de depuración}
+
+USART2 se asignó al puerto virtual del depurador ST-LINK. A 115200 baudios se emitieron mensajes periódicos con lecturas de sensores, estado de la tarjeta y del enlace Bluetooth. Ese canal no alimentó la aplicación del usuario, pero apoyó la verificación del prototipo durante el desarrollo.
+
+%----------------------------------------------------------------------------------------
+\section{Integración entre hardware y software}
+\label{sec:integracion-hw-sw}
+
+\subsection{Dispositivo móvil}
+
+La interfaz del usuario se implementó como PWA con React \citep{react} y Vite \citep{vite}. La capa de presentación accedió al HC-10 mediante Web Bluetooth y al perfil GATT (del inglés \textit{Generic Attribute Profile}) del CC2541. Los mapas emplearon Leaflet \citep{leaflet}. El análisis de las líneas JSON se ejecutó en el navegador, sin publicar un binario en las tiendas de aplicaciones.
+
+\subsection{Flujo de datos extremo a extremo}
+
+El registro local en CSV sobre microSD conservó series temporales cuando el teléfono no estaba emparejado. El intercambio inalámbrico cubrió la visualización en tiempo casi real y la consulta del estado del dispositivo según el período de telemetría definido en las tareas del firmware. En la figura~\ref{fig:cap3-integracion-e2e} se resume la adquisición, la escritura en tarjeta y el envío por Bluetooth en un diagrama de integración o de temporización entre tareas del RTOS.
+
+\begin{figure}[H]
+	\centering
+	\fbox{\begin{minipage}{0.88\textwidth}
+		\centering\vspace{0.30\textheight}
+		\textit{Espacio reservado para diagrama de integración o temporización extremo a extremo.}\vspace{0.30\textheight}
+	\end{minipage}}
+	\caption[Integración extremo a extremo]{Flujo de datos entre sensores, almacenamiento local y dispositivo móvil.}
+	\label{fig:cap3-integracion-e2e}
+\end{figure}

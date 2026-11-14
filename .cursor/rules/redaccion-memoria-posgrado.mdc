@@ -25,6 +25,7 @@ Evitá:
 - conectores mal usados o excesivos
 - mezcla de estilos entre escritura propia y IA
 - expresiones informales, vagas o marcas personales (redacción impersonal)
+- citas bibliográficas agrupadas en una sola llamada (`\citep{a,b}` y equivalentes `[x,y]` en el PDF). Usar un `\citep{clave}` por fuente (p. ej. `\citep{a}\citep{b}`)
 
 **Unidades de medida (español):** escribir la unidad pegada al número (p. ej. `180MHz`, `3.3V`, `100kHz`, `512KiB`). No usar espacio irrompible de LaTeX (`~`) entre cifra y unidad.
 
@@ -33,3 +34,15 @@ Evitá:
 Si el usuario aporta texto de referencia, usarlo solo como guía de estilo, sin copiar frases ni contenido.
 
 Al entregar cambios sustanciales de redacción, **señalar advertencias** si detectás datos técnicos, citas, fechas o cifras que deberían verificarse contra el proyecto o la bibliografía.
+
+## Capítulo 3 — extensión objetivo (15–20 páginas)
+
+Al redactar o ampliar `Chapter3.tex`, **no superar ~20 páginas** en el PDF final del capítulo y **apuntar a 15–20** cuando estén todas las secciones y figuras.
+
+**Reparto orientativo (completo):** 3.1 Arquitectura ~2,5–3 páginas (diagrama bloques, capas software). 3.2 Hardware ~3–4 (esquemático, PCB, opcional foto). 3.3 Firmware ~3–4 (flujo RTOS/tareas, opcional tabla prioridades). 3.4 Comunicaciones ~4–5 (tabla buses, JSON, secuencia HC-10). 3.5 Integración ~2,5–3 (e2e, opcional captura PWA). Total estimado **~16–19 páginas** (texto + figuras con `[H]`).
+
+**Proporción mientras se redacta:** con ~1/3 del contenido listo, el capítulo debería ocupar **unas 5–7 páginas** en el PDF. Reservar espacio de figura con placeholders acotados (`0.28\textheight` a `0.35\textheight`). Preferir una figura por idea. No repetir en texto lo que ya muestra el diagrama en bloques del §3.1.
+
+**Dónde ampliar sin pasarse:** hardware (alimentación, pines, ruteo, montaje, párrafos breves + figuras). Firmware (prioridades, períodos, interacción entre tareas, sin listados largos de código). Comunicaciones (un ejemplo JSON acotado, no dump del repositorio). Integración (flujo BLE/GATT y PWA, captura compacta si aporta).
+
+**Qué evitar en el cap. 3:** párrafos que dupliquen el capítulo 2 (UART/I2C/SPI genéricos). Subsecciones vacías solo para rellenar páginas.
