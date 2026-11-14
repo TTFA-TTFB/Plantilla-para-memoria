@@ -2,7 +2,7 @@
 
 \label{Chapter2}
 
-Este capítulo presenta las tecnologías de hardware y de software de terceros que sustentan el prototipo de telemetría. Se describe qué componentes se utilizaron, para qué sirven y qué capacidades ofrecen según la documentación del fabricante. La asignación de periféricos, la interconexión en el prototipo, la arquitectura de firmware y el cliente móvil se desarrollan en el capítulo~\ref{Chapter3}.
+Este capítulo presenta las tecnologías de hardware y de software de terceros que sustentan el prototipo de telemetría. Se describe qué componentes se utilizaron, para qué sirven y qué capacidades ofrecen según la documentación del fabricante. La asignación de periféricos, la interconexión en el prototipo, la arquitectura de firmware y el dispositivo móvil se desarrollan en el capítulo~\ref{Chapter3}.
 
 %----------------------------------------------------------------------------------------
 \section{Plataforma de hardware}
@@ -100,7 +100,7 @@ La capa HAL expone rutinas de configuración y tipos comunes para UART, I2C y SP
 
 En el extremo móvil intervienen tecnologías web estándar. Una aplicación web progresiva (PWA, del inglés \textit{Progressive Web App}) \citep{mdn_pwa} permite desplegar una interfaz en el navegador con comportamiento cercano al de una aplicación nativa. React \citep{react} es una biblioteca para construir interfaces por componentes, y Vite \citep{vite} una herramienta de empaquetado y servidor de desarrollo para el ecosistema JavaScript.
 
-La API Web Bluetooth \citep{w3c_web_bluetooth} del navegador habilita la comunicación con periféricos BLE desde una página web, sin publicar un binario en las tiendas. Para mapas interactivos se emplean bibliotecas como Leaflet \citep{leaflet}. El diseño concreto del cliente, el flujo de datos y la integración con el módulo HC-10 se describen en el capítulo~\ref{Chapter3}.
+La API Web Bluetooth \citep{w3c_web_bluetooth} del navegador habilita la comunicación con periféricos BLE desde una página web, sin publicar un binario en las tiendas. Para mapas interactivos se emplean bibliotecas como Leaflet \citep{leaflet}. El diseño concreto del dispositivo móvil, el flujo de datos y la integración con el módulo HC-10 se describen en el capítulo~\ref{Chapter3}.
 
 %----------------------------------------------------------------------------------------
 \section{Protocolos y buses de comunicación}
