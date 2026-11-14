@@ -28,6 +28,8 @@ Evitá:
 
 **Unidades de medida (español):** escribir la unidad pegada al número (p. ej. `180MHz`, `3.3V`, `100kHz`, `512KiB`). No usar espacio irrompible de LaTeX (`~`) entre cifra y unidad.
 
+**Siglas y términos en inglés:** en la **primera aparición** de cada sigla o expresión en el documento (o capítulo, según pida el usuario), usar la forma `(SIGLA, del inglés \textit{expresión en inglés})`. En menciones posteriores, solo la sigla sin repetir «del inglés».
+
 Si el usuario aporta texto de referencia, usarlo solo como guía de estilo, sin copiar frases ni contenido.
 
 Al entregar cambios sustanciales de redacción, **señalar advertencias** si detectás datos técnicos, citas, fechas o cifras que deberían verificarse contra el proyecto o la bibliografía.
