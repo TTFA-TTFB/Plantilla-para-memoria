@@ -1,4 +1,4 @@
-# LaTeX — artefactos de compilación
+# LaTeX - artefactos de compilación
 *.aux
 *.log
 *.out
